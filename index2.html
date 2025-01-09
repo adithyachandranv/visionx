@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>macOS-Like Animation</title>
   <style>
+    /* Previous styles remain the same until animations */
     body {
       margin: 0;
       height: 100vh;
@@ -14,26 +15,32 @@
       background: #f0f0f0;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
-      gap: 20px;
     }
 
-    .trigger-box {
-      width: 150px;
-      height: 150px;
+    #openButton {
+      padding: 10px 20px;
+      font-size: 16px;
       background-color: #007aff;
       color: white;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 10px;
+      border: none;
+      border-radius: 6px;
       cursor: pointer;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      font-size: 16px;
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    .trigger-box:hover {
-      transform: scale(1.05);
-      box-shadow: 0 5px 15px rgba(0, 122, 255, 0.4);
+    #openButton:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+    }
+
+    #openButton.bounce {
+      animation: buttonBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    @keyframes buttonBounce {
+      0%, 100% { transform: scale(1); }
+      40% { transform: scale(0.94); }
+      70% { transform: scale(1.03); }
     }
 
     .window {
@@ -61,6 +68,7 @@
       transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Rest of the styles remain the same */
     .titlebar {
       height: 28px;
       background: #f6f6f6;
@@ -110,10 +118,7 @@
   </style>
 </head>
 <body>
-  <div class="trigger-box" data-content="Content for Box 1">Box 1</div>
-  <div class="trigger-box" data-content="Content for Box 2">Box 2</div>
-  <div class="trigger-box" data-content="Content for Box 3">Box 3</div>
-
+  <button id="openButton">Open Window</button>
   <div class="window" id="animatedWindow">
     <div class="titlebar">
       <div class="window-controls">
@@ -122,16 +127,23 @@
         <button class="control-btn maximize"></button>
       </div>
     </div>
-    <div class="window-content" id="windowContent">
-      <!-- Content will be dynamically inserted here -->
+    <div class="window-content">
+      <h2>macOS Window</h2>
+      <p>This is a macOS-style window with realistic animations.</p>
     </div>
   </div>
 
   <script>
-    const triggerBoxes = document.querySelectorAll('.trigger-box');
+    const openButton = document.getElementById('openButton');
     const closeButton = document.getElementById('closeButton');
     const windowElement = document.getElementById('animatedWindow');
-    const windowContent = document.getElementById('windowContent');
+
+    function setWindowPosition(buttonRect) {
+      const windowRect = windowElement.getBoundingClientRect();
+      windowElement.style.transformOrigin = 'bottom left';
+      windowElement.style.left = `${buttonRect.left}px`;
+      windowElement.style.top = `${buttonRect.top - windowRect.height}px`;
+    }
 
     function centerWindow() {
       const rect = windowElement.getBoundingClientRect();
@@ -141,20 +153,40 @@
       windowElement.style.top = `${y}px`;
     }
 
-    triggerBoxes.forEach((box) => {
-      box.addEventListener('click', () => {
-        const content = box.getAttribute('data-content');
-        windowContent.innerHTML = `<h2>${content}</h2>`;
-        
-        // Center the window and open it
-        centerWindow();
+    openButton.addEventListener('click', () => {
+      const buttonRect = openButton.getBoundingClientRect();
+      openButton.classList.add('bounce');
+      setWindowPosition(buttonRect);
+      
+      requestAnimationFrame(() => {
         windowElement.classList.add('open');
+        setTimeout(() => {
+          windowElement.style.transition = 'all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)';
+          centerWindow();
+        }, 100);
       });
+      
+      setTimeout(() => {
+        openButton.classList.remove('bounce');
+      }, 800);
     });
 
     closeButton.addEventListener('click', () => {
-      // Close the window
-      windowElement.classList.remove('open');
+      const buttonRect = openButton.getBoundingClientRect();
+      openButton.classList.add('bounce');
+      
+      windowElement.style.transition = 'all 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+      setWindowPosition(buttonRect);
+      
+      setTimeout(() => {
+        windowElement.classList.add('closing');
+        windowElement.classList.remove('open');
+      }, 50);
+      
+      setTimeout(() => {
+        windowElement.classList.remove('closing');
+        openButton.classList.remove('bounce');
+      }, 600);
     });
 
     window.addEventListener('resize', () => {
