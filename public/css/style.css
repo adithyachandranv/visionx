@@ -1,0 +1,50 @@
+body {
+    margin: 0px;
+}
+
+
+.main-land {
+    height: 50vh;
+    width: 100%;
+    background-color: gray;
+    border-radius: 10px;
+}
+
+.full-cont {
+    margin: 10px;
+    display: flex;
+    gap: 10px;
+    flex-direction: column;
+}
+
+.bottom-cont {
+    display: flex;
+
+    gap: 20px;
+    height: 50vh;
+    width: 100%;
+    background-color: red;
+}
+
+#boxes-1 {
+    border-radius: 10px;
+    height: 100%;
+    width: 20%;
+    background-color: gray;
+}
+
+#boxes-2 {
+    height: 50%;
+    width: 50%;
+    background-color: grey;
+}
+
+#boxes-3 {
+    height: 50%;
+    width: 40%;
+    background-color: gray;
+}
+
+.boxes {
+    background-color: red;
+}
