@@ -48,3 +48,86 @@ body {
 .boxes {
     background-color: red;
 }
+
+.masonry {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    gap: 16px;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+.box {
+    background-color: #ccc;
+    border-radius: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    box-sizing: border-box;
+}
+
+.side-big img {
+    object-fit: contain;
+}
+
+.side-big {
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ccc;
+    grid-column: span 1;
+    grid-row: span 2;
+}
+
+/* Medium boxes */
+.medium {
+    grid-column: span 2;
+    grid-row: span 1;
+}
+
+/* Small boxes */
+.small {
+    grid-column: span 1;
+    grid-row: span 1;
+}
+
+.side-big:hover {
+    transition: ease;
+    background-color: #ff5733;
+    color: black;
+}
+
+.side-big video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Overlay on Hover */
+.side-big:hover .overlay {
+    opacity: 1;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    /* Solid color overlay */
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.3s ease-in-out;
+}
