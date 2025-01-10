@@ -1,10 +1,12 @@
+const videoContainer = document.getElementById('videoContainer');
+const video = document.getElementById('video');
 
-const hoverBox = document.getElementById('box-side');
-
-hoverBox.addEventListener('mouseover', () => {
-    hoverBox.textContent = 'Events';
+// Pause the video on hover
+videoContainer.addEventListener('mouseover', () => {
+    video.pause();
 });
 
-hoverBox.addEventListener('mouseout', () => {
-    hoverBox.textContent = 'Events';
+// Resume the video when the mouse leaves
+videoContainer.addEventListener('mouseout', () => {
+    video.play();
 });
