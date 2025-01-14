@@ -1,5 +1,5 @@
 // Array of colors to cycle through
-const colors = ['#FF5733', '#33FF57', '#3357FF', '#FF33A1', '#FF8333', '#33FFF5'];
+const colors = ['#111018', '#0e0c12', '#0c070d', '#10090c', '#160f12', '#1d1517', '#241b1c', '#2a2121'];
 
 // Function to change the background color
 function changeBackgroundColor() {
@@ -8,4 +8,4 @@ function changeBackgroundColor() {
 }
 
 // Change the background color every 5 seconds (5000 milliseconds)
-setInterval(changeBackgroundColor, 5000);
+setInterval(changeBackgroundColor, 1000);

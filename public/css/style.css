@@ -9,6 +9,9 @@ body {
 }
 
 .main-land {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     height: 50vh;
     width: 100%;
     background-color: gray;
@@ -125,4 +128,9 @@ body {
 .small {
     grid-column: span 1;
     grid-row: span 1;
+}
+
+.overlay {
+    display: flex;
+    align-items: center;
 }
