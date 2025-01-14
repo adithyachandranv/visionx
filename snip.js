@@ -1,9 +1,10 @@
 async function fetchAndRenderSnippets() {
     try {
-      const response = await fetch('/sniip.json');
-      if (!response.ok) {
-        throw new Error('Failed to fetch snippets.');
-      }
+        const response = await fetch('https://raw.githubusercontent.com/Abhiramkris/visionx/main/sniip.json');
+        if (!response.ok) {
+          throw new Error('Failed to fetch snippets.');
+        }
+      
       const data = await response.json();
   
       const faqContainer = document.getElementById('faqContainer');
