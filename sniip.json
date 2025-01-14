@@ -1,0 +1,17 @@
+{
+    "snippets": [
+      {
+        "title": "Snippet 1",
+        "code": "console.log('This is snippet 1');"
+      },
+      {
+        "title": "Snippet 2",
+        "code": "function add(a, b) {\n  return a + b;\n}\nconsole.log(add(2, 3));"
+      },
+      {
+        "title": "Snippet 3",
+        "code": "const greet = (name) => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greet('World'));"
+      }
+    ]
+  }
+  
