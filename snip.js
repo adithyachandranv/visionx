@@ -1,44 +1,58 @@
-// JSON data for snippets
-const snippets = {
-    snippet1: "console.log('This is snippet 1');",
-    snippet2: `
-  function add(a, b) {
-    return a + b;
-  }
-  console.log(add(2, 3));`,
-    snippet3: `
-  const greet = (name) => {
-    return \`Hello, \${name}!\`;
-  };
-  console.log(greet('World'));`,
-  };
+async function fetchAndRenderSnippets() {
+    try {
+      const response = await fetch('/sniip.json');
+      if (!response.ok) {
+        throw new Error('Failed to fetch snippets.');
+      }
+      const data = await response.json();
   
-  // DOM elements
-  const dropdown = document.getElementById("snippetDropdown");
-  const codeContainer = document.getElementById("codeContainer");
-  const codeContent = document.getElementById("codeContent");
-  const copyButton = document.getElementById("copyButton");
+      const faqContainer = document.getElementById('faqContainer');
+      faqContainer.innerHTML = '';
   
-  // Event listener for dropdown selection
-  dropdown.addEventListener("change", () => {
-    const selectedValue = dropdown.value;
+      data.snippets.forEach((snippet, index) => {
+        const faqItem = document.createElement('div');
+        faqItem.classList.add('faq-item');
   
-    if (selectedValue && snippets[selectedValue]) {
-      codeContent.textContent = snippets[selectedValue];
-      codeContainer.classList.remove("hidden");
-    } else {
-      codeContainer.classList.add("hidden");
-    }
-  });
+        const questionButton = document.createElement('button');
+        questionButton.classList.add('faq-question');
+        questionButton.innerHTML = `
+          ${snippet.title}
+          <span class="plus-icon">+</span>
+        `;
   
-  // Event listener for copy button
-  copyButton.addEventListener("click", () => {
-    navigator.clipboard.writeText(codeContent.textContent)
-      .then(() => {
-        alert("Code copied to clipboard!");
-      })
-      .catch((err) => {
-        console.error("Failed to copy text: ", err);
+        const answerDiv = document.createElement('div');
+        answerDiv.classList.add('faq-answer');
+  
+        const codeContent = document.createElement('pre');
+        codeContent.textContent = snippet.code;
+  
+        const copyButton = document.createElement('button');
+        copyButton.classList.add('copy-button');
+        copyButton.textContent = 'Copy';
+  
+        answerDiv.appendChild(codeContent);
+        answerDiv.appendChild(copyButton);
+  
+        faqItem.appendChild(questionButton);
+        faqItem.appendChild(answerDiv);
+        faqContainer.appendChild(faqItem);
+  
+        questionButton.addEventListener('click', () => {
+          const isOpen = !answerDiv.style.display || answerDiv.style.display === 'none';
+          document.querySelectorAll('.faq-answer').forEach((ans) => (ans.style.display = 'none'));
+          answerDiv.style.display = isOpen ? 'block' : 'none';
+        });
+  
+        copyButton.addEventListener('click', () => {
+          navigator.clipboard.writeText(snippet.code).then(() => {
+            alert('Code copied to clipboard!');
+          });
+        });
       });
-  });
+    } catch (error) {
+      console.error('Error fetching or rendering snippets:', error);
+    }
+  }
+  
+  document.addEventListener('DOMContentLoaded', fetchAndRenderSnippets);
   
