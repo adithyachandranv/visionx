@@ -1,0 +1,21 @@
+const storedHashedPassword = 'hashed_password_from_database';
+const userInputPassword = 'password_attempt_from_user';
+
+bcrypt.compare(userInputPassword, storedHashedPassword, (err, result) => {
+    if (err) {
+        // Handle error
+        console.error('Error comparing passwords:', err);
+        return;
+    }
+
+if (result) {
+    // Passwords match, authentication successful
+    console.log('Passwords match! User authenticated.');
+} else {
+    // Passwords don't match, authentication failed
+    console.log('Passwords do not match! Authentication failed.');
+}
+});
+
+bcrypt.hash(): This function is used to generate a hash of a plaintext password. It takes the plaintext password and a salt factor (optional) as input parameters and returns the hashed password asynchronously.
+bcrypt.compare(): This function is used to compare a plaintext password with its hashed counterpart. It takes the plaintext password and the hashed password as input parameters and returns a boolean value indicating whether the passwords match.
