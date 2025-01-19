@@ -2,7 +2,7 @@
   "snippets": [
     {
       "title": "Database Configuration",
-      "code": "const mongoose = require('mongoose');\n\nconst connectDB = async () => {\n    try {\n        await mongoose.connect('mongodb://127.0.0.1:27017/registrationDB', {\n            useNewUrlParser: true,\n            useUnifiedTopology: true\n        });\n        console.log('Database connected successfully');\n    } catch (err) {\n        console.error('Database connection error:', err);\n        process.exit(1);\n    }\n};\n\nmodule.exports = connectDB;"
+      "code": "const mongoose = require('mongoose');\n\n// Replace <db_password> with the actual password for the user\nconst dbPassword = '<YWGvqIOSGksId3FN>';  // Replace this with your actual password\nconst dbURI = `mongodb+srv://adithyachandranv01:${dbPassword}@visionx.rlgsk.mongodb.net/?retryWrites=true&w=majority&appName=visionx`;\n\nconst connectDB = async () => {\n    try {\n        await mongoose.connect(dbURI, {\n            useNewUrlParser: true,\n            useUnifiedTopology: true,\n        });\n        console.log('Database connected successfully');\n    } catch (err) {\n        console.error('Database connection error:', err);\n        process.exit(1);\n    }\n};\n\n// Call the function to connect\nconnectDB();"
     },
     {
       "title": "Encrypt and Decrypt OTP using Crypto",
@@ -47,6 +47,9 @@
     {
       "title": "Dashboard Page (EJS View)",
       "code": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Dashboard</title>\n</head>\n<body>\n    <h1>Welcome, <%= username %>!</h1>\n    <p>You have successfully registered and verified your OTP.</p>\n</body>\n</html>"
+    },
+    {
+      "title": ""
     }
   ]
 }
