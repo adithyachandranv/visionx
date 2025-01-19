@@ -1,17 +1,52 @@
 {
-    "snippets": [
-      {
-        "title": "Snippet 1",
-        "code": "console.log('This is snippet 1');"
-      },
-      {
-        "title": "Snippet 2",
-        "code": "function add(a, b) {\n  return a + b;\n}\nconsole.log(add(2, 3));"
-      },
-      {
-        "title": "Snippet 3",
-        "code": "const greet = (name) => {\n  return `Hello, ${name}!`;\n};\nconsole.log(greet('World'));"
-      }
-    ]
-  }
-  
+  "snippets": [
+    {
+      "title": "Database Configuration",
+      "code": "const mongoose = require('mongoose');\n\nconst connectDB = async () => {\n    try {\n        await mongoose.connect('mongodb://127.0.0.1:27017/registrationDB', {\n            useNewUrlParser: true,\n            useUnifiedTopology: true\n        });\n        console.log('Database connected successfully');\n    } catch (err) {\n        console.error('Database connection error:', err);\n        process.exit(1);\n    }\n};\n\nmodule.exports = connectDB;"
+    },
+    {
+      "title": "Encrypt and Decrypt OTP using Crypto",
+      "code": "const crypto = require('crypto');\n\nconst SECRET_KEY = 'your-strong-secret-key'; // Replace with a secure key\n\n// Encrypt the OTP\nexports.encrypt = (text) => {\n    const cipher = crypto.createCipher('aes-256-cbc', SECRET_KEY);\n    let encrypted = cipher.update(text, 'utf8', 'hex');\n    encrypted += cipher.final('hex');\n    return encrypted;\n};\n\n// Decrypt the OTP\nexports.decrypt = (encryptedText) => {\n    const decipher = crypto.createDecipher('aes-256-cbc', SECRET_KEY);\n    let decrypted = decipher.update(encryptedText, 'hex', 'utf8');\n    decrypted += decipher.final('utf8');\n    return decrypted;\n};"
+    },
+    {
+      "title": "MongoDB User Schema with Mongoose",
+      "code": "const mongoose = require('mongoose');\n\nconst userSchema = new mongoose.Schema({\n    username: String,\n    email: String,\n    password: String,\n    otp: String,\n});\n\nmodule.exports = mongoose.model('User', userSchema);"
+    },
+    {
+      "title": "Middleware for Validating User Input",
+      "code": "module.exports = (req, res, next) => {\n    const { username, email, password } = req.body;\n    if (!username || !email || !password) {\n        return res.render('register', { error: 'All fields are required!' });\n    }\n    next();\n};"
+    },
+    {
+      "title": "Middleware for OTP Verification and User Registration",
+      "code": "const { decrypt } = require('../utils/crypto');\nconst User = require('../models/user');\n\nmodule.exports = async (req, res, next) => {\n    const { enteredOtp } = req.body;\n\n    // Decrypt OTP from the session\n    const decryptedOtp = decrypt(req.session.otp);\n\n    if (enteredOtp !== decryptedOtp) {\n        return res.render('otp', { error: 'Invalid OTP!' });\n    }\n\n    // Save user to the database after OTP verification\n    const { username, email, password } = req.session.user;\n    const newUser = new User({ username, email, password, otp: decryptedOtp });\n    await newUser.save();\n\n    // Set session as authenticated\n    req.session.isAuthenticated = true;\n\n    // Proceed to the next middleware (dashboard)\n    next();\n};"
+    },
+    {
+      "title": "Send OTP via Email Using Nodemailer",
+      "code": "const nodemailer = require('nodemailer');\n\nconst transporter = nodemailer.createTransport({\n    service: 'Gmail',\n    auth: {\n        user: 'your_email@gmail.com',\n        pass: 'your_email_password',\n    },\n});\n\n// Send the OTP via email\nexports.sendOtp = async (email, otp) => {\n    try {\n        const mailOptions = {\n            from: 'your_email@gmail.com',\n            to: email,\n            subject: 'Your OTP Code',\n            text: `Your OTP code is ${otp}.`,  // Send plain OTP to the email\n        };\n        await transporter.sendMail(mailOptions);\n        console.log('OTP sent to email:', email);\n    } catch (err) {\n        console.error('Error sending OTP:', err);\n    }\n};"
+    },
+    {
+      "title": "Register User and Send OTP",
+      "code": "const { encrypt } = require('../utils/crypto');\nconst otpController = require('./otpController');\n\nexports.registerUser = async (req, res) => {\n    const { username, email, password } = req.body;\n\n    // Generate OTP\n    const otp = Math.floor(100000 + Math.random() * 900000).toString();\n\n    // Encrypt the OTP\n    const encryptedOtp = encrypt(otp);\n\n    // Save the user's data temporarily in session (not in DB yet)\n    req.session.user = { username, email, password };\n    req.session.otp = encryptedOtp;\n\n    // Send OTP to user's email\n    await otpController.sendOtp(email, otp);\n\n    // Render OTP page so user can enter OTP\n    res.render('otp', { error: null });\n};"
+    },
+    {
+      "title": "Dashboard Route",
+      "code": "exports.dashboard = (req, res) => {\n    if (!req.session.isAuthenticated) {\n        return res.redirect('/');\n    }\n    res.render('dashboard', { username: req.session.user.username });\n};"
+    },
+    {
+      "title": "Express Server Setup with Routes and Middleware",
+      "code": "const express = require('express');\nconst bodyParser = require('body-parser');\nconst session = require('express-session');\nconst connectDB = require('./config/db');\nconst validateForm = require('./middlewares/validateForm');\nconst validateOtp = require('./middlewares/validateOtp');\nconst userController = require('./controllers/userController');\n\n// Initialize app\nconst app = express();\nconnectDB();\n\n// Middleware\napp.use(bodyParser.urlencoded({ extended: true }));\napp.use(express.static('public'));\napp.use(\n    session({\n        secret: 'secret-key',\n        resave: false,\n        saveUninitialized: true,\n    })\n);\n\n// View engine setup\napp.set('view engine', 'ejs');\napp.set('views', './views');\n\n// Routes\napp.get('/', (req, res) => res.render('register', { error: null }));\napp.post('/register', validateForm, userController.registerUser);\napp.post('/check-otp', validateOtp, (req, res) => {\n    res.redirect('/dashboard');\n});\napp.get('/dashboard', userController.dashboard);\n\n// Start server\nconst PORT = 3000;\napp.listen(PORT, () => {\n    console.log(`Server running on http://localhost:${PORT}`);\n});"
+    },
+    {
+      "title": "Registration Form (EJS View)",
+      "code": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Register</title>\n</head>\n<body>\n    <h1>Register</h1>\n    <% if (error) { %>\n        <p style=\"color: red;\"><%= error %></p>\n    <% } %>\n    <form action=\"/register\" method=\"POST\">\n        <label>Username:</label>\n        <input type=\"text\" name=\"username\"><br>\n        <label>Email:</label>\n        <input type=\"email\" name=\"email\"><br>\n        <label>Password:</label>\n        <input type=\"password\" name=\"password\"><br>\n        <button type=\"submit\">Register</button>\n    </form>\n</body>\n</html>"
+    },
+    {
+      "title": "OTP Verification Form (EJS View)",
+      "code": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Verify OTP</title>\n</head>\n<body>\n    <h1>Enter OTP</h1>\n    <% if (error) { %>\n        <p style=\"color: red;\"><%= error %></p>\n    <% } %>\n    <form action=\"/check-otp\" method=\"POST\">\n        <label>OTP:</label>\n        <input type=\"text\" name=\"enteredOtp\"><br>\n        <button type=\"submit\">Verify</button>\n    </form>\n</body>\n</html>"
+    },
+    {
+      "title": "Dashboard Page (EJS View)",
+      "code": "<!DOCTYPE html>\n<html>\n<head>\n    <title>Dashboard</title>\n</head>\n<body>\n    <h1>Welcome, <%= username %>!</h1>\n    <p>You have successfully registered and verified your OTP.</p>\n</body>\n</html>"
+    }
+  ]
+}
